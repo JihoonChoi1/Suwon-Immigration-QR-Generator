@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>QR 생성 및 저장</title>
+    <script src="qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        #qrcode {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        input {
+            width: 300px;
+            padding: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>무료 QR 코드 생성 및 저장</h2>
+    <input type="text" id="urlInput" placeholder="https://...">
+    <div class="controls">
+        <button onclick="makeCode()">QR 생성</button>
+        <button onclick="downloadQR()" id="saveBtn" style="display:none;">PNG로 저장</button>
+    </div>
+
+    <div id="qrcode"></div>
+
+    <script>
+        var qrcode = new QRCode(document.getElementById("qrcode"), {
+            width: 256,
+            height: 256
+        });
+
+        function makeCode() {
+            var elText = document.getElementById("urlInput");
+            if (!elText.value) return;
+
+            qrcode.makeCode(elText.value);
+            document.getElementById("saveBtn").style.display = "inline-block";
+        }
+
+        function downloadQR() {
+            var qrImage = document.querySelector("#qrcode img");
+
+            if (qrImage) {
+                var imgAddr = qrImage.src;
+                var link = document.createElement("a");
+
+                link.href = imgAddr;
+                link.download = "my_qrcode.png";
+                link.click();
+            } else {
+                alert("먼저 QR 코드를 생성해주세요!");
+            }
+        }
+    </script>
+</body>
+
+</html>
