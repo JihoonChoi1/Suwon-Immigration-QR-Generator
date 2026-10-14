@@ -1,0 +1,141 @@
+{
+  "captured_at": "2026-10-13T21:24:59.496Z",
+  "commit": "0bd0040",
+  "dirty": true,
+  "server": "python manage.py runserver (DJANGO_DEBUG=1), .venv: Python 3.14.8, Django 6.0.9, segno 1.6.6",
+  "browser": "Chrome 155.0.8059.40 (headless, Playwright), deviceScaleFactor 2",
+  "sample_url": "https://github.com/JihoonChoi1/Suwon-Immigration-QR-Generator",
+  "shots": [
+    {
+      "file": "screens/01-empty.png",
+      "note": "First load: nothing generated yet."
+    },
+    {
+      "file": "screens/02-validation-error.png",
+      "note": "Typed \"drive.google.com/file/d/sample/view\" without a scheme and pressed the button."
+    },
+    {
+      "file": "screens/03-loading.png",
+      "note": "Loading state; the script delayed the API call so it could be photographed."
+    },
+    {
+      "file": "screens/04-success.png",
+      "note": "Generated for https://github.com/JihoonChoi1/Suwon-Immigration-QR-Generator at the default level (M)."
+    },
+    {
+      "file": "sample-qr.png",
+      "note": "The PNG the \"PNG로 저장\" button saved (qr_github.com.png)."
+    },
+    {
+      "file": "screens/05-saved-toast.png",
+      "note": "Right after pressing PNG로 저장: the confirmation toast."
+    },
+    {
+      "file": "screens/06-network-error.png",
+      "note": "Network error state; the script aborted the request as if the server were unreachable."
+    },
+    {
+      "file": "screens/07-success-dark-h.png",
+      "note": "Dark mode (follows the OS), highest error correction (H)."
+    },
+    {
+      "file": "screens/08-mobile-empty.png",
+      "note": "Phone width, first load."
+    },
+    {
+      "file": "screens/09-mobile-success.png",
+      "note": "Phone width, after generating (scrolled to the result)."
+    }
+  ],
+  "api": [
+    {
+      "request": {
+        "url": "https://github.com/JihoonChoi1/Suwon-Immigration-QR-Generator"
+      },
+      "status": 200,
+      "response": {
+        "url": "https://github.com/JihoonChoi1/Suwon-Immigration-QR-Generator",
+        "format": "png",
+        "mime_type": "image/png",
+        "data_uri": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZ... (600 bytes, truncated here)",
+        "bytes": 600,
+        "version": 4,
+        "error_correction": "M",
+        "modules": 33,
+        "size_px": 410
+      }
+    },
+    {
+      "request": {
+        "url": "https://github.com/JihoonChoi1/Suwon-Immigration-QR-Generator",
+        "format": "svg",
+        "error_correction": "H"
+      },
+      "status": 200,
+      "response": {
+        "url": "https://github.com/JihoonChoi1/Suwon-Immigration-QR-Generator",
+        "format": "svg",
+        "mime_type": "image/svg+xml",
+        "data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cD... (3268 bytes, truncated here)",
+        "bytes": 3268,
+        "version": 7,
+        "error_correction": "H",
+        "modules": 45,
+        "size_px": 530
+      }
+    },
+    {
+      "request": {
+        "url": "drive.google.com/file/d/sample/view"
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "missing_scheme",
+          "message": "The link must start with http:// or https://.",
+          "field": "url"
+        }
+      }
+    },
+    {
+      "request": {
+        "url": "javascript:alert(1)"
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "unsupported_scheme",
+          "message": "Only http and https links are accepted, not 'javascript:'.",
+          "field": "url"
+        }
+      }
+    },
+    {
+      "request": {
+        "url": "https://user:secret@example.com/file"
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "credentials_in_url",
+          "message": "The link must not contain a user name or password.",
+          "field": "url"
+        }
+      }
+    },
+    {
+      "request": {
+        "url": "https://github.com/JihoonChoi1/Suwon-Immigration-QR-Generator",
+        "scale": 100
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "invalid_option",
+          "message": "Field 'scale' must be an integer from 1 to 40.",
+          "field": "scale"
+        }
+      }
+    }
+  ]
+}

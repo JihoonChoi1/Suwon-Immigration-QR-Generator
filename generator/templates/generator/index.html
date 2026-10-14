@@ -1,0 +1,152 @@
+{% load static %}<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR 생성 및 저장</title>
+  <meta name="description" content="파일 링크를 QR 코드로 만들어 PNG나 SVG로 저장합니다. QR 코드는 이 서버에서 직접 생성됩니다.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="{% static 'generator/favicon.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'generator/app.css' %}">
+  <script src="{% static 'generator/app.js' %}" defer></script>
+</head>
+<body data-api="{% url 'generator:qr-api' %}" data-max-length="{{ max_url_length }}">
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+        <rect x="3" y="3" width="11" height="11" rx="2.5"/><rect x="18" y="3" width="11" height="11" rx="2.5"/>
+        <rect x="3" y="18" width="11" height="11" rx="2.5"/><rect x="18" y="18" width="4.5" height="4.5" rx="1"/>
+        <rect x="24.5" y="24.5" width="4.5" height="4.5" rx="1"/>
+      </svg>
+      <div>
+        <p class="eyebrow">파일 링크 배포용 도구</p>
+        <h1>QR 코드 생성 및 저장</h1>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <p class="lead">파일 링크를 붙여 넣으면 이 서버에서 바로 QR 코드를 만듭니다. 유료 서비스나 외부 서버를 거치지 않습니다.</p>
+
+    <div class="layout">
+      <section class="panel" aria-labelledby="form-title">
+        <h2 id="form-title" class="panel-title"><span class="step" aria-hidden="true">1</span>링크 입력</h2>
+
+        <form id="qr-form" novalidate>
+          <label class="label" for="url">파일 링크</label>
+          <div class="field">
+            <input id="url" name="url" type="url" inputmode="url" autocomplete="off" autocapitalize="off"
+                   spellcheck="false" placeholder="https://..." required
+                   aria-describedby="url-hint url-count url-error">
+            <button type="button" class="field-clear" id="url-clear" aria-label="입력 지우기" hidden>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5.5 5.5l9 9m0-9l-9 9"/></svg>
+            </button>
+          </div>
+          <div class="field-meta">
+            <p id="url-hint" class="hint">http:// 또는 https://로 시작하는 전체 주소</p>
+            <p id="url-count" class="count"><span id="url-count-value">0</span> / {{ max_url_length }}</p>
+          </div>
+          <p id="url-error" class="field-error" role="alert" hidden></p>
+
+          <fieldset class="levels">
+            <legend class="label">오류 복원 수준</legend>
+            <div class="segmented">
+              <label><input type="radio" name="ec" value="L"><span><b>낮음</b><small>7%</small></span></label>
+              <label><input type="radio" name="ec" value="M" checked><span><b>보통</b><small>15%</small></span></label>
+              <label><input type="radio" name="ec" value="Q"><span><b>높음</b><small>25%</small></span></label>
+              <label><input type="radio" name="ec" value="H"><span><b>최고</b><small>30%</small></span></label>
+            </div>
+            <p class="hint">인쇄해서 나눠 줄 때는 ‘높음’ 이상을 권장합니다. 수준이 높을수록 코드가 촘촘해집니다.</p>
+          </fieldset>
+
+          <button type="submit" class="btn btn-primary btn-block" id="submit">
+            <span class="btn-label">QR 생성</span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+        </form>
+
+        <ul class="notes">
+          <li>입력한 링크는 QR 코드를 만드는 데에만 쓰이고 서버에 저장되지 않습니다.</li>
+          <li>QR 코드는 이 서버에서 직접 그립니다. 외부 서비스나 CDN을 쓰지 않습니다.</li>
+        </ul>
+      </section>
+
+      <section class="panel" aria-labelledby="preview-title">
+        <h2 id="preview-title" class="panel-title"><span class="step" aria-hidden="true">2</span>미리 보기 및 저장</h2>
+
+        <div class="preview" id="preview" data-state="empty" aria-busy="false">
+          <div class="state state-empty">
+            <div class="placeholder" aria-hidden="true">
+              <svg viewBox="0 0 64 64" focusable="false">
+                <rect x="6" y="6" width="18" height="18" rx="3"/><rect x="40" y="6" width="18" height="18" rx="3"/>
+                <rect x="6" y="40" width="18" height="18" rx="3"/><path d="M40 40h6v6h-6zM52 52h6v6h-6zM52 40h6v6h-6zM40 52h6v6h-6z"/>
+              </svg>
+            </div>
+            <p class="state-title">아직 만든 QR 코드가 없습니다</p>
+            <p class="state-text">링크를 입력하고 ‘QR 생성’을 누르면 여기에 나타납니다.</p>
+          </div>
+
+          <div class="state state-loading">
+            <div class="skeleton" aria-hidden="true"></div>
+            <p class="state-text">QR 코드를 만드는 중…</p>
+          </div>
+
+          <div class="state state-error">
+            <div class="error-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.5v5.5M12 16.2v.3"/></svg>
+            </div>
+            <p class="state-title">QR 코드를 만들지 못했습니다</p>
+            <p class="state-text" id="preview-error-text" role="alert"></p>
+            <button type="button" class="btn btn-secondary" id="retry">다시 시도</button>
+          </div>
+
+          <div class="state state-success">
+            <figure class="qr-frame">
+              <img id="qr-img" alt="" width="264" height="264">
+            </figure>
+            <p class="stale" id="stale" hidden>입력한 링크가 바뀌었습니다. 새 링크로 만들려면 ‘QR 생성’을 다시 누르세요.</p>
+            <dl class="meta">
+              <div class="meta-url">
+                <dt>담긴 링크</dt>
+                <dd><span id="qr-url" class="encoded"></span></dd>
+              </div>
+              <div>
+                <dt>코드 정보</dt>
+                <dd id="qr-info"></dd>
+              </div>
+            </dl>
+            <div class="actions">
+              <button type="button" class="btn btn-primary" id="save-png">
+                <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10 3v9m-4-4 4 4 4-4M4 15.5h12"/></svg>
+                PNG로 저장
+              </button>
+              <button type="button" class="btn btn-secondary" id="save-svg">
+                <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10 3v9m-4-4 4 4 4-4M4 15.5h12"/></svg>
+                SVG로 저장
+              </button>
+              <button type="button" class="btn btn-secondary" id="copy-image" hidden>
+                <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><rect x="6.5" y="6.5" width="10" height="10" rx="2"/><path d="M13.5 4.5v-.5a1.5 1.5 0 0 0-1.5-1.5H5A1.5 1.5 0 0 0 3.5 4v7A1.5 1.5 0 0 0 5 12.5h.5"/></svg>
+                이미지 복사
+              </button>
+              <button type="button" class="btn btn-secondary" id="copy-url">
+                <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M8.5 11.5a3.5 3.5 0 0 0 5 0l2.5-2.5a3.5 3.5 0 0 0-5-5l-1 1M11.5 8.5a3.5 3.5 0 0 0-5 0L4 11a3.5 3.5 0 0 0 5 5l1-1"/></svg>
+                링크 복사
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>QR 코드는 이 서버의 Django API(<code>POST /api/qr</code>)가 생성합니다.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
